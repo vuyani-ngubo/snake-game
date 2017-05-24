@@ -1,0 +1,15 @@
+.game {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+#board {
+	background: #364135;
+}
+
+.score {
+	text-align: center;
+	font-family: sans-serif;
+}
