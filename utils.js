@@ -4,3 +4,10 @@ export function randomPos(xLimit, yLimit) {
 		y: Math.floor(Math.random() * yLimit),
 	};
 }
+
+export const displacementDict = {
+	up: { axis: "y", magnitude: -1 },
+	down: { axis: "y", magnitude: 1 },
+	right: { axis: "x", magnitude: 1 },
+	left: { axis: "x", magnitude: -1 },
+};
