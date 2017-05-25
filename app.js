@@ -1,9 +1,8 @@
 import Snake from "./snake.js";
+import { randomPos } from "./utils";
 
 const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
-
-var apple = randomPos();
 
 document.addEventListener("keydown", ({ key }) => {
 	if (key === "ArrowUp") addToQueue("up");
@@ -16,6 +15,7 @@ document.addEventListener("keydown", ({ key }) => {
 	}
 });
 
+var apple = randomPos();
 var snake = new Snake();
 var velocity = {
 	speed: 0.2,
@@ -34,13 +34,6 @@ var displacementDict = {
 	right: { axis: "x", magnitude: 1 },
 	left: { axis: "x", magnitude: -1 },
 };
-
-function randomPos() {
-	return {
-		x: Math.floor((Math.random() * canvas.width) / 10),
-		y: Math.floor((Math.random() * canvas.height) / 10),
-	};
-}
 
 function drawApple() {
 	const { x, y } = apple;
