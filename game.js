@@ -1,7 +1,7 @@
 import Snake from "./snake.js";
 import { generateApple } from "./apple.js";
 import { displacementDict } from "./utils.js";
-// import Graphics from 'graphics.js'
+import Graphics from "./graphics.js";
 
 export default class game {
 	constructor() {
@@ -71,7 +71,7 @@ export default class game {
 	}
 
 	renderGame() {
-		// Graphics.render(apple, snake)
+		Graphics.render(this.apple, this.snake);
 		// -> Inside Graphics Render, call drawApple() & drawSnake()
 	}
 }
