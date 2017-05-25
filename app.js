@@ -1,51 +1,30 @@
+import Snake from "./snake.js";
+
 const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
 
 var apple = randomPos();
 
 document.addEventListener("keydown", ({ key }) => {
-	if (key === "ArrowUp") queueMove("up");
-	else if (key === "ArrowDown") queueMove("down");
-	else if (key === "ArrowLeft") queueMove("left");
-	else if (key === "ArrowRight") queueMove("right");
+	if (key === "ArrowUp") addToQueue("up");
+	else if (key === "ArrowDown") addToQueue("down");
+	else if (key === "ArrowLeft") addToQueue("left");
+	else if (key === "ArrowRight") addToQueue("right");
 	else if (key === " ") {
 		if (isPaused) play();
 		else pause();
 	}
 });
 
-var snake = {
-	head: {
-		x: 27,
-		y: 24,
-	},
-	body: [
-		{
-			x: 26,
-			y: 24,
-		},
-		{
-			x: 25,
-			y: 24,
-		},
-		{
-			x: 24,
-			y: 24,
-		},
-		{
-			x: 23,
-			y: 24,
-		},
-	],
-};
+var snake = new Snake();
 var velocity = {
-	speed: 1,
+	speed: 0.2,
 	displacement: {
 		axis: "x",
 		magnitude: 1,
 	},
 };
-var movesQueue = [];
+var queue = [];
 var isPaused = true;
 
 var refreshID;
@@ -83,21 +62,20 @@ function startGame() {
 	drawApple();
 	drawSnake();
 
-	refreshID = setInterval(() => refresh(), 500);
-	isPaused = false;
+	play();
 }
 
 function refresh() {
 	context.clearRect(0, 0, 500, 500);
 
-	moveSnake();
+	updateGameState();
 
 	drawApple();
 	drawSnake();
 }
 
 function play() {
-	refreshID = setInterval(() => refresh(), 500);
+	refreshID = setInterval(() => refresh(), velocity.speed * 1000);
 	isPaused = false;
 }
 
@@ -106,41 +84,29 @@ function pause() {
 	isPaused = true;
 }
 
-function moveSnake() {
+function updateGameState() {
 	changeDirection();
 
-	const head = { ...snake.head };
-	let body = [...snake.body];
+	const position = { ...snake.head };
 	const { axis, magnitude } = velocity.displacement;
 
-	let prevSegment = { ...head };
+	position[axis] += magnitude;
 
-	head[axis] += magnitude;
+	if (position[axis] > 49) position[axis] = 0;
+	else if (position[axis] < 0) position[axis] = 49;
 
-	if (head[axis] > 49) head[axis] = 0;
-	else if (head[axis] < 0) head[axis] = 49;
-
-	body = body.map((segment) => {
-		let temp = { ...prevSegment };
-		prevSegment = segment;
-		return temp;
-	});
-
-	snake = {
-		head,
-		body,
-	};
+	snake.move(position);
 }
 
-function queueMove(input) {
+function addToQueue(input) {
 	let displacement = displacementDict[input];
-	movesQueue.push(displacement);
+	queue.push(displacement);
 }
 
 function changeDirection() {
-	let displacement = movesQueue.shift();
+	let displacement = queue.shift();
 	if (displacement) {
-		const { axis, magnitude } = velocity.displacement;
+		const { axis } = velocity.displacement;
 		if (displacement.axis === axis) return;
 		velocity.displacement = displacement;
 	}
