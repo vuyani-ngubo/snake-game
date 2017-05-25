@@ -23,6 +23,7 @@ export default class Game {
 		this.queue = [];
 		this.isPaused = true;
 		this.refreshID;
+		this.score = 0;
 	}
 
 	play() {
@@ -64,6 +65,12 @@ export default class Game {
 		else if (position[axis] < 0) position[axis] = 49;
 
 		this.snake.move(position);
+
+		if (this.eatApple()) {
+			this.score++;
+			this.apple = generateApple(dimensions.width, dimensions.height);
+			this.snake.grow();
+		}
 	}
 
 	addToQueue(input) {
@@ -77,6 +84,12 @@ export default class Game {
 	}
 
 	renderGame() {
-		Graphics.render(this.apple, this.snake);
+		Graphics.render(this.apple, this.snake, this.score);
+	}
+
+	eatApple() {
+		const head = this.snake.head;
+		const apple = this.apple;
+		if (head.x === apple.x && head.y === apple.y) return true;
 	}
 }

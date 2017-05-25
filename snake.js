@@ -5,6 +5,7 @@ export default class Snake {
 			y: yLimit / 2,
 		};
 		this.body = this.generateBody();
+		this.history = [{ head: this.head, body: this.body }];
 	}
 
 	generateBody() {
@@ -31,5 +32,18 @@ export default class Snake {
 
 		this.head = head;
 		this.body = body;
+		this.history.push({ head, body });
 	}
+
+	grow() {
+		const history = this.history;
+		const historyLength = history.length;
+		const body = history[historyLength - 1].body;
+		const bodyLength = body.length;
+		const pos = body[bodyLength - 1];
+
+		this.body.push(pos);
+	}
+
+	shrink(pos) {}
 }

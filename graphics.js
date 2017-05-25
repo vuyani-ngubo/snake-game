@@ -1,3 +1,4 @@
+const scoreDOM = document.querySelector("#score");
 const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
 
@@ -16,7 +17,7 @@ function drawApple(apple) {
 	context.closePath();
 }
 
-function drawSnake(snake) {
+function renderSnake(snake) {
 	context.fillStyle = colors["snake"];
 	const head = { ...snake.head };
 	context.fillRect(head.x * scale, head.y * scale, scale, scale);
@@ -25,10 +26,15 @@ function drawSnake(snake) {
 	);
 }
 
-export function render(apple, snake) {
+function updateScore(score) {
+	scoreDOM.innerHTML = score;
+}
+
+export function render(apple, snake, score) {
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	drawApple(apple);
-	drawSnake(snake);
+	renderSnake(snake);
+	updateScore(score);
 }
 
 export default {
