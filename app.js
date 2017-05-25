@@ -2,10 +2,10 @@ const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
 
 document.addEventListener("keydown", ({ key }) => {
-	if (key === "ArrowUp") changeDirection("up");
-	else if (key === "ArrowDown") changeDirection("down");
-	else if (key === "ArrowLeft") changeDirection("left");
-	else if (key === "ArrowRight") changeDirection("right");
+	if (key === "ArrowUp") queueSequence("up");
+	else if (key === "ArrowDown") queueSequence("down");
+	else if (key === "ArrowLeft") queueSequence("left");
+	else if (key === "ArrowRight") queueSequence("right");
 	else if (key === " ") {
 		if (isPaused) play();
 		else pause();
@@ -41,6 +41,7 @@ var vector = {
 	magnitude: 1,
 	displacement: [1, 0],
 };
+var moveSequence = [];
 var isPaused = true;
 
 var refreshID;
@@ -100,18 +101,45 @@ function pause() {
 }
 
 function moveSnake() {
-	const clonedBody = [...snake.body];
-	clonedBody.forEach((segment) => {
-		segment.x += vector.displacement[0];
-		segment.y += vector.displacement[1];
+	changeDirection();
+	const snakeClone = [...snake.body];
+	const newHead = { ...snakeClone[0] };
+	const body = snake.body.filter((segment, index) => index !== 0);
+	let prevSegment = snake.body[0];
+
+	newHead.x += vector.displacement[0];
+	newHead.y += vector.displacement[1];
+
+	if (newHead.x > 49) newHead.x = 0;
+	else if (newHead.x < 0) newHead.x = 49;
+
+	if (newHead.y > 49) newHead.y = 0;
+	else if (newHead.y < 0) newHead.y = 49;
+
+	const newBody = body.map((segment) => {
+		let temp = { ...prevSegment };
+		prevSegment = segment;
+		return temp;
 	});
+
 	snake = {
-		body: clonedBody,
+		body: [newHead, ...newBody],
 	};
 }
 
-function changeDirection(input) {
-	vector.displacement = directionDict[input];
+function queueSequence(input) {
+	let displacement = directionDict[input];
+	moveSequence.push(displacement);
+}
+
+function changeDirection() {
+	let displacement = moveSequence.shift();
+	if (displacement) {
+		const [newX, newY] = displacement;
+		const [oldX, oldY] = vector.displacement;
+		if (newX === oldX || newY === oldY) return;
+		vector.displacement = displacement;
+	}
 }
 
 startGame();
