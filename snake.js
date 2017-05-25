@@ -1,15 +1,19 @@
 export default class Snake {
-	constructor() {
+	constructor(xLimit, yLimit) {
 		this.head = {
-			x: 27,
-			y: 24,
+			x: xLimit / 2,
+			y: yLimit / 2,
 		};
-		this.body = [
-			{ x: 26, y: 24 },
-			{ x: 25, y: 24 },
-			{ x: 24, y: 24 },
-			{ x: 23, y: 24 },
-		];
+		this.body = this.generateBody();
+	}
+
+	generateBody() {
+		let { x, y } = { ...this.head };
+		const body = [];
+		for (let i = 0; i < 6; i++) {
+			body.push({ x: x - (i + 1), y });
+		}
+		return body;
 	}
 
 	move({ x, y }) {

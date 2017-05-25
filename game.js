@@ -3,10 +3,16 @@ import { generateApple } from "./apple.js";
 import { displacementDict } from "./utils.js";
 import Graphics from "./graphics.js";
 
-export default class game {
+const { scale } = Graphics;
+const dimensions = {
+	width: Graphics.dimensions.width / scale,
+	height: Graphics.dimensions.height / scale,
+};
+
+export default class Game {
 	constructor() {
-		this.apple = generateApple(50, 50);
-		this.snake = new Snake();
+		this.apple = generateApple(dimensions.width, dimensions.height);
+		this.snake = new Snake(dimensions.width, dimensions.height);
 		this.velocity = {
 			speed: 0.2,
 			displacement: {
@@ -72,6 +78,5 @@ export default class game {
 
 	renderGame() {
 		Graphics.render(this.apple, this.snake);
-		// -> Inside Graphics Render, call drawApple() & drawSnake()
 	}
 }
