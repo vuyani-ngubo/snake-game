@@ -1,11 +1,13 @@
 const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
 
+var apple = randomPos();
+
 document.addEventListener("keydown", ({ key }) => {
-	if (key === "ArrowUp") queueSequence("up");
-	else if (key === "ArrowDown") queueSequence("down");
-	else if (key === "ArrowLeft") queueSequence("left");
-	else if (key === "ArrowRight") queueSequence("right");
+	if (key === "ArrowUp") queueMove("up");
+	else if (key === "ArrowDown") queueMove("down");
+	else if (key === "ArrowLeft") queueMove("left");
+	else if (key === "ArrowRight") queueMove("right");
 	else if (key === " ") {
 		if (isPaused) play();
 		else pause();
@@ -13,11 +15,11 @@ document.addEventListener("keydown", ({ key }) => {
 });
 
 var snake = {
+	head: {
+		x: 27,
+		y: 24,
+	},
 	body: [
-		{
-			x: 27,
-			y: 24,
-		},
 		{
 			x: 26,
 			y: 24,
@@ -36,20 +38,22 @@ var snake = {
 		},
 	],
 };
-var apple = randomPos();
-var vector = {
-	magnitude: 1,
-	displacement: [1, 0],
+var velocity = {
+	speed: 1,
+	displacement: {
+		axis: "x",
+		magnitude: 1,
+	},
 };
-var moveSequence = [];
+var movesQueue = [];
 var isPaused = true;
 
 var refreshID;
-var directionDict = {
-	up: [0, -1],
-	down: [0, 1],
-	right: [1, 0],
-	left: [-1, 0],
+var displacementDict = {
+	up: { axis: "y", magnitude: -1 },
+	down: { axis: "y", magnitude: 1 },
+	right: { axis: "x", magnitude: 1 },
+	left: { axis: "x", magnitude: -1 },
 };
 
 function randomPos() {
@@ -63,13 +67,15 @@ function drawApple() {
 	const { x, y } = apple;
 	context.fillStyle = "#ff1f1f";
 	context.beginPath();
-	context.arc(x + 5, y + 5, 5, 0, Math.PI * 2);
+	context.arc(x * 10 + 5, y * 10 + 5, 5, 0, Math.PI * 2);
 	context.fill();
 	context.closePath();
 }
 
 function drawSnake() {
 	context.fillStyle = "#00aaff";
+	const head = { ...snake.head };
+	context.fillRect(head.x * 10, head.y * 10, 10, 10);
 	snake.body.forEach(({ x, y }) => context.fillRect(x * 10, y * 10, 10, 10));
 }
 
@@ -102,43 +108,41 @@ function pause() {
 
 function moveSnake() {
 	changeDirection();
-	const snakeClone = [...snake.body];
-	const newHead = { ...snakeClone[0] };
-	const body = snake.body.filter((segment, index) => index !== 0);
-	let prevSegment = snake.body[0];
 
-	newHead.x += vector.displacement[0];
-	newHead.y += vector.displacement[1];
+	const head = { ...snake.head };
+	let body = [...snake.body];
+	const { axis, magnitude } = velocity.displacement;
 
-	if (newHead.x > 49) newHead.x = 0;
-	else if (newHead.x < 0) newHead.x = 49;
+	let prevSegment = { ...head };
 
-	if (newHead.y > 49) newHead.y = 0;
-	else if (newHead.y < 0) newHead.y = 49;
+	head[axis] += magnitude;
 
-	const newBody = body.map((segment) => {
+	if (head[axis] > 49) head[axis] = 0;
+	else if (head[axis] < 0) head[axis] = 49;
+
+	body = body.map((segment) => {
 		let temp = { ...prevSegment };
 		prevSegment = segment;
 		return temp;
 	});
 
 	snake = {
-		body: [newHead, ...newBody],
+		head,
+		body,
 	};
 }
 
-function queueSequence(input) {
-	let displacement = directionDict[input];
-	moveSequence.push(displacement);
+function queueMove(input) {
+	let displacement = displacementDict[input];
+	movesQueue.push(displacement);
 }
 
 function changeDirection() {
-	let displacement = moveSequence.shift();
+	let displacement = movesQueue.shift();
 	if (displacement) {
-		const [newX, newY] = displacement;
-		const [oldX, oldY] = vector.displacement;
-		if (newX === oldX || newY === oldY) return;
-		vector.displacement = displacement;
+		const { axis, magnitude } = velocity.displacement;
+		if (displacement.axis === axis) return;
+		velocity.displacement = displacement;
 	}
 }
 
