@@ -1,4 +1,4 @@
-import Game from "./game.js";
+import Game from "./modules/game.js";
 
 document.addEventListener("keydown", ({ key }) => {
 	if (key === "ArrowUp") game.addToQueue("up");
