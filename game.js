@@ -14,7 +14,7 @@ export default class Game {
 		this.apple = generateApple(dimensions.width, dimensions.height);
 		this.snake = new Snake(dimensions.width, dimensions.height);
 		this.velocity = {
-			speed: 0.2,
+			speed: 0.15,
 			displacement: {
 				axis: "x",
 				magnitude: 1,
@@ -71,6 +71,10 @@ export default class Game {
 			this.apple = generateApple(dimensions.width, dimensions.height);
 			this.snake.grow();
 		}
+		const index = this.eatBody();
+		if (index) {
+			this.snake.shrink(index);
+		}
 	}
 
 	addToQueue(input) {
@@ -91,5 +95,14 @@ export default class Game {
 		const head = this.snake.head;
 		const apple = this.apple;
 		if (head.x === apple.x && head.y === apple.y) return true;
+	}
+
+	eatBody() {
+		const head = this.snake.head;
+		const body = this.snake.body;
+		const index = body.findIndex(({ x, y }) => head.x === x && head.y === y);
+		if (index > 0) {
+			return index;
+		}
 	}
 }

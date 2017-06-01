@@ -30,20 +30,34 @@ export default class Snake {
 			return temp;
 		});
 
+		this.history.push({ head: this.head, body: this.body });
 		this.head = head;
 		this.body = body;
-		this.history.push({ head, body });
 	}
 
 	grow() {
+		const head = { ...this.head };
+		const body = [...this.body];
+
 		const history = this.history;
 		const historyLength = history.length;
-		const body = history[historyLength - 1].body;
+		const lastBody = history[historyLength - 1].body;
 		const bodyLength = body.length;
-		const pos = body[bodyLength - 1];
+		const pos = lastBody[bodyLength - 1];
 
-		this.body.push(pos);
+		body.push(pos);
+
+		this.history.push({ head: this.head, body: this.body });
+		this.head = head;
+		this.body = body;
 	}
 
-	shrink(pos) {}
+	shrink(index) {
+		const head = { ...this.head };
+		const body = this.body.filter((segment, i) => i < index);
+
+		this.history.push({ head: this.head, body: this.body });
+		this.head = head;
+		this.body = body;
+	}
 }
